@@ -1,0 +1,33 @@
+# Byte-compiled / optimized / DLL files
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+
+# Virtual Environments
+.venv/
+venv/
+ENV/
+env/
+
+# Environment configurations (local secrets)
+.env
+.env.local
+.env.*
+*.env
+
+# IDE / Editor configurations
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# OS files
+.DS_Store
+Thumbs.db
+
+# Terraform files
+.terraform/
+*.tfstate
+*.tfstate.backup
+.terraform.tfstate.lock.info

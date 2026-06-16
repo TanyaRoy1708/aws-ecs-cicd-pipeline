@@ -1,0 +1,63 @@
+import ipaddress
+
+def calculate_cidr(cidr_str: str) -> dict:
+    try:
+        cidr_str = cidr_str.strip()
+        if not cidr_str:
+            return {"success": False, "error": "Empty input"}
+
+        # Auto-append default subnet mask if missing
+        if "/" not in cidr_str:
+            if ":" in cidr_str:
+                cidr_str += "/128"
+            else:
+                cidr_str += "/32"
+
+        # Detect IPv6 vs IPv4
+        if ":" in cidr_str:
+            network = ipaddress.IPv6Network(cidr_str, strict=False)
+            prefix = network.prefixlen
+            
+            first_host = str(network.network_address)
+            last_host = str(network.broadcast_address)
+            num_hosts = network.num_addresses
+
+            return {
+                "success": True,
+                "is_ipv6": True,
+                "network_address": str(network.network_address),
+                "broadcast_address": "N/A (IPv6 uses Multicast)",
+                "netmask": str(network.netmask),
+                "num_hosts": f"{num_hosts:,}",
+                "first_host": first_host,
+                "last_host": last_host
+            }
+        else:
+            network = ipaddress.IPv4Network(cidr_str, strict=False)
+            prefix = network.prefixlen
+            
+            if prefix == 32:
+                first_host = str(network.network_address)
+                last_host = str(network.network_address)
+                num_hosts = 1
+            elif prefix == 31:
+                first_host = str(network.network_address)
+                last_host = str(network.broadcast_address)
+                num_hosts = 2
+            else:
+                first_host = str(network.network_address + 1)
+                last_host = str(network.broadcast_address - 1)
+                num_hosts = network.num_addresses - 2
+
+            return {
+                "success": True,
+                "is_ipv6": False,
+                "network_address": str(network.network_address),
+                "broadcast_address": str(network.broadcast_address),
+                "netmask": str(network.netmask),
+                "num_hosts": f"{num_hosts:,}",
+                "first_host": first_host,
+                "last_host": last_host
+            }
+    except Exception as e:
+        return {"success": False, "error": str(e)}
