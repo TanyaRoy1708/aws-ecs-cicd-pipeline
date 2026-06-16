@@ -17,7 +17,7 @@ USER appuser
 
 EXPOSE 8000
 
-# Health check matches /ready endpoint in main.py
+# Readiness probe — verifies routes are loaded and app is serving
 HEALTHCHECK --interval=30s --timeout=5s --start-period=30s --retries=3 \
     CMD python -c "import urllib.request; urllib.request.urlopen('http://localhost:8000/ready')" || exit 1
 
