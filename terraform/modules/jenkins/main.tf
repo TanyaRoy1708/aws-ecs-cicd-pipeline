@@ -20,6 +20,7 @@ resource "aws_instance" "jenkins" {
   security_groups      = [var.jenkins_sg_id]
   iam_instance_profile = var.instance_profile_name
   key_name             = var.key_name
+  user_data            = file("${path.module}/user-data.sh")
 
   root_block_device {
     volume_size           = 30
