@@ -1,8 +1,11 @@
 import os
+import logging
 from sqlalchemy import create_engine, text
 
+logger = logging.getLogger(__name__)
+
 DB_HOST = os.getenv("DB_HOST", "")
-DB_USER = os.getenv("DB_USER", "dbuser")
+DB_USER = os.getenv("DB_USER", "postgres")
 DB_PASSWORD = os.getenv("DB_PASSWORD", "")
 DB_NAME = os.getenv("DB_NAME", "devopstoolbox")
 DB_PORT = os.getenv("DB_PORT", "5432")
@@ -24,7 +27,8 @@ if DB_HOST and DB_PASSWORD:
                     input_value TEXT
                 )
             """))
-    except Exception:
+    except Exception as e:
+        logger.error("Failed to connect to database at startup: %s", e)
         db_engine = None
 
 def log_tool_usage(tool_name: str, input_value: str):
@@ -36,7 +40,8 @@ def log_tool_usage(tool_name: str, input_value: str):
                     {"tool": tool_name, "val": input_value[:100]}
                 )
             return
-        except Exception:
+        except Exception as e:
+            logger.warning("Failed to log tool usage to DB, falling back to memory: %s", e)
             pass
     # Fallback to local memory stats
     if tool_name in _local_stats_count:
@@ -54,6 +59,7 @@ def get_tool_stats() -> dict:
                     )
                     stats[tool] = res.scalar() or 0
             return stats
-        except Exception:
+        except Exception as e:
+            logger.warning("Failed to fetch tool stats from DB, falling back to memory: %s", e)
             pass
     return _local_stats_count

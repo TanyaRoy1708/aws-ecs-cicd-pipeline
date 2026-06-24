@@ -1,4 +1,4 @@
-from app.services.cron_service import explain_cron
+from services.cron_service import explain_cron
 
 def test_explain_cron_macro():
     result = explain_cron("@daily")
